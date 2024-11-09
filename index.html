@@ -39,43 +39,79 @@
             font-size: 16px;
             margin-top: 10px;
         }
+
+        /* Camera preview container */
+        #qr-reader {
+            width: 600px;
+            height: 400px;
+            display: none;
+            margin: 20px auto;
+            border: 2px solid #FF6100;
+        }
+
+        /* Add space between elements */
+        input, button {
+            margin: 10px 0;
+        }
     </style>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
 </head>
 
 <body>
     <h2>QR Code Check</h2>
-    <div id="message"></div>
-    <input type="password" id="password" placeholder="Enter password">
-    <button id="password-button">Submit</button>
-    <button id="checkin-button" disabled>Check In</button>
-    <div id="loading">Checking in...</div>
+    <h1>Login to Check-in</h1>
+
+    <!-- Password input and button for validation -->
+    <div id="password-section">
+        <input type="password" id="password" placeholder="Enter password">
+        <button id="password-button">Submit</button>
+    </div>
+
+    <!-- QR Code section initially hidden -->
+    <div id="qr-section" style="display: none;">
+        <button id="openCameraBtn">Open Camera</button>
+        <div id="qr-reader"></div> <!-- QR reader container -->
+        <p id="qr-result">Scan a QR code to check in</p>
+
+        <div id="message"></div>
+
+        <!-- Check-in button initially disabled -->
+        <button id="checkin-button" disabled>Check In</button>
+        <div id="loading">Checking in...</div>
+    </div>
 
     <script>
         // Get the uniqueId from the URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const uniqueId = urlParams.get('id');
+        const uniqueIdFromUrl = urlParams.get('id');
         const checkinButton = document.getElementById('checkin-button');
         const loadingIndicator = document.getElementById('loading');
         const passwordButton = document.getElementById('password-button');
         const passwordField = document.getElementById('password');
+        const openCameraBtn = document.getElementById('openCameraBtn');
+        const qrReader = document.getElementById('qr-reader');
+        const qrResult = document.getElementById('qr-result');
+        const qrSection = document.getElementById('qr-section');
+        const passwordSection = document.getElementById('password-section');
+        
+        let uniqueId = uniqueIdFromUrl; // Initialize uniqueId with the URL value
 
         // Check if the uniqueId is present
         if (!uniqueId) {
             document.getElementById('message').innerHTML = '<p class="error-message">No ID provided in URL.</p>';
         }
 
-        // Handle password submission and enable check-in button if password is correct
+        // Handle password submission and enable the QR code section if password is correct
         passwordButton.addEventListener('click', () => {
             const password = passwordField.value;
 
             // Check if the password is correct
             if (password === '123') {
-                document.getElementById('message').innerHTML = `<p class="check-message">Password correct. Click the button to check-in: ${uniqueId}</p>`;
-                checkinButton.disabled = false;  // Enable the check-in button
-                document.getElementById('password-section').style.display = 'none'; // Hide the password section after successful login
+                passwordSection.style.display = 'none'; // Hide the password section
+                qrSection.style.display = 'block'; // Show the QR code and check-in section
+                document.getElementById('message').innerHTML = `<p class="check-message">Password correct. Scan a QR code to check in: ${uniqueId}</p>`;
             } else {
                 document.getElementById('message').innerHTML = `<p class="error-message">Incorrect password. Try again.</p>`;
-                checkinButton.disabled = true;  // Keep the button disabled
             }
         });
 
@@ -113,6 +149,46 @@
                 });
         });
 
+        // QR code scanner
+        const html5QrCode = new Html5Qrcode("qr-reader");
+
+        openCameraBtn.addEventListener("click", function() {
+            // Show the camera view
+            qrReader.style.display = "block";
+            openCameraBtn.style.display = "none";  // Hide the 'Open Camera' button
+
+            // Start scanning the QR code
+            html5QrCode.start(
+                { facingMode: "environment" }, // Use the rear camera
+                {
+                    fps: 10,    // Frames per second
+                    qrbox: 250  // QR code box size
+                },
+                (decodedText) => {
+                    // Handle the QR code data (decodedText)
+                    console.log("Decoded Text: ", decodedText);
+                    qrResult.innerText = "QR Code Scanned: " + decodedText;
+                    
+                    // Extract uniqueId from the QR code (assume QR code contains a JSON object with "uniqueId")
+                    try {
+                        const qrData = JSON.parse(decodedText);
+                        if (qrData.uniqueId) {
+                            uniqueId = qrData.uniqueId; // Update uniqueId with the value from the QR code
+                            document.getElementById('message').innerHTML = `<p class="check-message">QR Code scanned: ${uniqueId}. Now click the button to check-in.</p>`;
+                            checkinButton.disabled = false;  // Enable the check-in button after scanning the QR code
+                        }
+                    } catch (error) {
+                        console.error("Invalid QR code format", error);
+                        qrResult.innerText = "Invalid QR code format";
+                    }
+                },
+                (errorMessage) => {
+                    // Handle errors during scanning
+                    console.error("Error scanning QR code:", errorMessage);
+                    qrResult.innerText = "Error scanning QR code";
+                }
+            );
+        });
     </script>
 </body>
 
