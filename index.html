@@ -6,76 +6,157 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Check</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url("glowintejo1.jpg");
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
             text-align: center;
-            padding: 50px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #00008B;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="password"]:focus {
+            border-color: #00008B;
+            outline: none;
+        }
+
+        button {
+            background-color: #00008B;
+            color: white;
+            font-size: 16px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #00008B;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
 
         .check-message {
-            font-size: 24px;
+            font-size: 18px;
             color: green;
+            margin-top: 15px;
         }
 
         .error-message {
-            font-size: 24px;
+            font-size: 18px;
             color: red;
-        }
-
-        #checkin-button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #FF6100;
-            color: white;
-        }
-
-        #checkin-button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
+            margin-top: 15px;
         }
 
         #loading {
             display: none;
             font-size: 16px;
             margin-top: 10px;
+            color: #00008B;
         }
 
-        /* Camera preview container */
         #qr-reader {
-            width: 600px;
-            height: 400px;
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+            border: 2px solid #00008B;
+            border-radius: 8px;
             display: none;
-            margin: 20px auto;
-            border: 2px solid #FF6100;
         }
 
-        /* Add space between elements */
-        input, button {
-            margin: 10px 0;
+        #qr-result {
+            font-size: 16px;
+            margin-top: 10px;
+            color: green;
+        }
+
+        #message {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                width: 90%;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
-
 </head>
 
 <body>
-    <h2>QR Code Check</h2>
-    <h1>Login to Check-in</h1>
 
-    <!-- Password input and button for validation -->
-    <div id="password-section">
-        <input type="password" id="password" placeholder="Enter password">
-        <button id="password-button">Submit</button>
-    </div>
+    <div class="container">
+        <h2>QR Code Check</h2>
+        <h1>Login to Check-in</h1>
 
-    <div id="qr-section" style="display: none;">
-        <button id="openCameraBtn">Open Camera</button>
-        <div id="qr-reader"></div> 
-        <p id="qr-result">Scan a QR code to check in</p>
+        <!-- Password input and button for validation -->
+        <div id="password-section">
+            <input type="password" id="password" placeholder="Enter password">
+            <button id="password-button">Submit</button>
+        </div>
 
-        <div id="message"></div>
-        <button id="checkin-button" disabled>Check In</button>
-        <div id="loading">Checking in...</div>
+        <div id="qr-section" style="display: none;">
+            <button id="openCameraBtn">Open Camera</button>
+            <div id="qr-reader"></div>
+            <p id="qr-result">Scan a QR code to check in</p>
+
+            <div id="message"></div>
+            <button id="checkin-button" disabled>Check In</button>
+            <div id="loading">Checking in...</div>
+        </div>
     </div>
 
     <script>
@@ -90,26 +171,27 @@
         const qrResult = document.getElementById('qr-result');
         const qrSection = document.getElementById('qr-section');
         const passwordSection = document.getElementById('password-section');
-        
-        let uniqueId = uniqueIdFromUrl; 
+
+        let uniqueId = uniqueIdFromUrl;
 
         if (!uniqueId) {
             document.getElementById('message').innerHTML = '<p class="error-message">No ID provided in URL.</p>';
         }
+
         passwordButton.addEventListener('click', () => {
             const password = passwordField.value;
             if (password === '123') {
                 passwordSection.style.display = 'none';
                 qrSection.style.display = 'block';
-                document.getElementById('message').innerHTML = `<p class="check-message">Password correct. Scan a QR code to check in: ${uniqueId}</p>`;
+                document.getElementById('message').innerHTML = `<p class="check-message">Password correct. Scan a QR code to check in</p>`;
             } else {
                 document.getElementById('message').innerHTML = `<p class="error-message">Incorrect password. Try again.</p>`;
             }
         });
 
         checkinButton.addEventListener('click', () => {
-            loadingIndicator.style.display = 'block';  
-            checkinButton.disabled = true;  
+            loadingIndicator.style.display = 'block';
+            checkinButton.disabled = true;
             fetch(`http://localhost:3000/checkin?uniqueId=${uniqueId}`, {
                 method: 'GET',
             })
@@ -120,7 +202,6 @@
                     return response.json();
                 })
                 .then(data => {
-        
                     loadingIndicator.style.display = 'none';
                     if (data.checkedIn) {
                         document.getElementById('message').innerHTML = '<p class="check-message">Checked In Successfully!</p>';
@@ -137,34 +218,37 @@
 
         const html5QrCode = new Html5Qrcode("qr-reader");
 
-        openCameraBtn.addEventListener("click", function() {
+        openCameraBtn.addEventListener("click", function () {
             qrReader.style.display = "block";
-            openCameraBtn.style.display = "none";  
+            document.getElementById('message').style.display = "none";
+            openCameraBtn.style.display = "none";
             html5QrCode.start(
-                { facingMode: "environment" }, 
+                { facingMode: "environment" },
                 {
-                    fps: 10,   
-                    qrbox: 250  
+                    fps: 10,
+                    qrbox: 250
                 },
                 (decodedText) => {
                     console.log("Decoded Text: ", decodedText);
                     qrResult.innerText = "QR Code Scanned: " + decodedText;
-                    
+                    html5QrCode.stop().then(() => {
+                        qrReader.style.display = "none";
+                        openCameraBtn.style.display = "block";
+                        console.log("Camera stopped and UI reset.");
+                    }).catch((err) => {
+                        console.error("Error stopping camera:", err);
+                    });
 
                     try {
-                        const qrData = JSON.parse(decodedText);
-                        if (qrData.uniqueId) {
-                            uniqueId = qrData.uniqueId; 
-                            document.getElementById('message').innerHTML = `<p class="check-message">QR Code scanned: ${uniqueId}. Now click the button to check-in.</p>`;
-                            checkinButton.disabled = false; 
-                        }
+                        uniqueId = decodedText;
+                        document.getElementById('message').innerHTML = `<p class="check-message">QR Code scanned: ${uniqueId}. Now click the button to check-in.</p>`;
+                        checkinButton.disabled = false;
                     } catch (error) {
                         console.error("Invalid QR code format", error);
                         qrResult.innerText = "Invalid QR code format";
                     }
                 },
                 (errorMessage) => {
-            
                     console.error("Error scanning QR code:", errorMessage);
                     qrResult.innerText = "Error scanning QR code";
                 }
