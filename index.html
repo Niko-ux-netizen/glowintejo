@@ -59,33 +59,16 @@
             document.getElementById('message').innerHTML = '<p class="error-message">No ID provided in URL.</p>';
         }
 
-        // Check if the person has already checked in
-        fetch(`https://script.google.com/macros/s/AKfycbwh8x7wRj2j53AkbG-zy6WZQkXR0ehzEfKLKg7_F9SjZuDIZOHjH672P_ytnl2CFztUcA/exec?uniqueId=${uniqueId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.checkedIn) {
-                document.getElementById('message').innerHTML = '<p class="check-message">ID Valid! You have already checked in.</p>';
-                checkinButton.disabled = true;  // Disable button if already checked in
-            } else {
-                document.getElementById('message').innerHTML = '<p class="check-message">ID Valid! Click the button to check in.</p>';
-                checkinButton.disabled = true;  // Initially disabled until password is entered
-            }
-        })
-        .catch(error => {
-            document.getElementById('message').innerHTML = '<p class="error-message">Error fetching check-in status. Please try again later.</p>';
-            console.error(error);
-        });
-
-        // Event listener for password submission
         passwordButton.addEventListener('click', () => {
             const password = passwordField.value;
 
             // Check if the password is correct
             if (password === '123') {
-                document.getElementById('message').innerHTML = `<p class="check-message">${uniqueId}</p>`;
+                document.getElementById('message').innerHTML = `<p class="check-message">Password correct. Click the button to check-in: ${uniqueId}</p>`;
                 checkinButton.disabled = false;  // Enable the check-in button
+                document.getElementById('password-section').style.display = 'none'; // Hide the password section after successful login
             } else {
-                document.getElementById('message').innerHTML = `<p class="error-message">${uniqueId}</p>`;
+                document.getElementById('message').innerHTML = `<p class="error-message">Incorrect password. Try again.</p>`;
                 checkinButton.disabled = true;  // Keep the button disabled
             }
         });
@@ -96,7 +79,7 @@
             checkinButton.disabled = true;  // Disable the button to prevent multiple clicks
 
             // Call Google Apps Script API to check the person in
-            fetch(`https://script.google.com/macros/s/AKfycbwWP2hnWf7s-4_YdsTiumKueMiWxng7e3f0B1IBZxHnHJ2o1DGJmKldjTHo-rIQfPhJUQ/exec?uniqueId=${uniqueId}`)
+            fetch(`https://script.google.com/macros/s/AKfycbyDXrm10pqfnK3SXGJLynq7aKurIaCfnBU3G93bgwlNEkYQ-1i0zRIe-P0cVOkv_XKZ1g/exec?uniqueId=${uniqueId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.checkedIn) {
