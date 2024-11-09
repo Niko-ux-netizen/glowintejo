@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Confirmation</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        .check-message { font-size: 24px; color: green; }
+        .error-message { font-size: 24px; color: red; }
+        #checkin-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #FF6100;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        #checkin-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #loading {
+            display: none;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        #password-section {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>QR Code Check</h2>
+    <div id="message"></div>
+    
+    <!-- Password Input Section -->
+    <div id="password-section">
+        <label for="password">Enter password to enable Check In:</label><br>
+        <input type="password" id="password" placeholder="Enter password">
+        <button id="password-button">Submit</button>
+    </div>
+
+    <div id="checkin-section" style="margin-top: 20px;">
+        <button id="checkin-button" disabled>Check In</button>
+        <div id="loading">Checking in...</div> <!-- Loading Indicator -->
+    </div>
+
+    <script>
+        // Get the uniqueId from the URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const uniqueId = urlParams.get('id');
+        const checkinButton = document.getElementById('checkin-button');
+        const loadingIndicator = document.getElementById('loading');
+        const passwordButton = document.getElementById('password-button');
+        const passwordField = document.getElementById('password');
+        
+        if (!uniqueId) {
+            document.getElementById('message').innerHTML = '<p class="error-message">No ID provided in URL.</p>';
+        }
+
+        // Check if the person has already checked in
+        fetch(`https://script.google.com/macros/s/AKfycbx1InDBPKuBOu9PTRssG22Vdg_ST8Aqnht6SBXrukqoQr__oGBlI6z4DxAKpVNkPM3J9A/exec?uniqueId=${uniqueId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.checkedIn) {
+                document.getElementById('message').innerHTML = '<p class="check-message">ID Valid! You have already checked in.</p>';
+                checkinButton.disabled = true;  // Disable button if already checked in
+            } else {
+                document.getElementById('message').innerHTML = '<p class="check-message">ID Valid! Click the button to check in.</p>';
+                checkinButton.disabled = true;  // Initially disabled until password is entered
+            }
+        })
+        .catch(error => {
+            document.getElementById('message').innerHTML = '<p class="error-message">Error fetching check-in status. Please try again later.</p>';
+            console.error(error);
+        });
+
+        // Event listener for password submission
+        passwordButton.addEventListener('click', () => {
+            const password = passwordField.value;
+
+            // Check if the password is correct
+            if (password === '123') {
+                document.getElementById('message').innerHTML = `<p class="check-message">${uniqueId}</p>`;
+                checkinButton.disabled = false;  // Enable the check-in button
+            } else {
+                document.getElementById('message').innerHTML = `<p class="error-message">${uniqueId}</p>`;
+                checkinButton.disabled = true;  // Keep the button disabled
+            }
+        });
+
+        // Event listener for button click to check-in
+        checkinButton.addEventListener('click', () => {
+            loadingIndicator.style.display = 'block';  // Show loading text
+            checkinButton.disabled = true;  // Disable the button to prevent multiple clicks
+
+            // Call Google Apps Script API to check the person in
+            fetch(`https://script.google.com/macros/s/AKfycbxFj9Tx8_GDZ9_QJ27QbO3ynlXO3j06Fp7rrgkgePtOeqBZmBO6/exec?uniqueId=${uniqueId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.checkedIn) {
+                    document.getElementById('message').innerHTML = '<p class="check-message">Checked In Successfully!</p>';
+                } else {
+                    document.getElementById('message').innerHTML = '<p class="error-message">Error Checking In. Please try again later.</p>';
+                }
+                loadingIndicator.style.display = 'none';  // Hide loading text
+            })
+            .catch(error => {
+                document.getElementById('message').innerHTML = '<p class="error-message">Error. Please try again later.</p>';
+                loadingIndicator.style.display = 'none';  // Hide loading text
+                console.error(error);
+            });
+        });
+    </script>
+</body>
+</html>
