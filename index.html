@@ -86,7 +86,7 @@
 
         .check-message {
             font-size: 18px;
-            color: green;
+
             margin-top: 15px;
         }
 
@@ -141,7 +141,12 @@
 
             #qr-reader {
                 width: 100%;
-                height: 250px;
+                max-width: 100%;
+                height: auto;
+                margin-top: 20px;
+                border: 2px solid #00008B;
+                border-radius: 8px;
+                display: none;
             }
         }
 
@@ -180,7 +185,7 @@
         <div id="qr-section" style="display: none;">
             <button id="openCameraBtn">Open Camera</button>
             <div id="qr-reader"></div>
-            <p id="qr-result">Scan a QR code to check in</p>
+            <p id="qr-result">Scan a QR code to check a person in</p>
 
             <div id="message"></div>
             <button id="checkin-button" disabled>Check In</button>
@@ -206,16 +211,11 @@
 
         let uniqueId = uniqueIdFromUrl;
 
-        if (!uniqueId) {
-            document.getElementById('message').innerHTML = '<p class="error-message">No ID provided in URL.</p>';
-        }
-
         passwordButton.addEventListener('click', () => {
             const password = passwordField.value;
             if (password === '123') {
                 passwordSection.style.display = 'none';
                 qrSection.style.display = 'block';
-                document.getElementById('message').innerHTML = `<p class="check-message">Password correct. Scan a QR code to check in</p>`;
             } else {
                 document.getElementById('message').innerHTML = `<p class="error-message">Incorrect password. Try again.</p>`;
             }
@@ -235,8 +235,9 @@
                 })
                 .then(data => {
                     loadingIndicator.style.display = 'none';
+                    document.getElementById('message').style.display = "block";
                     if (data.checkedIn) {
-                        document.getElementById('message').innerHTML = '<p class="check-message">Checked In Successfully!</p>';
+                        document.getElementById('message').innerHTML = `<p class="check-message">${data.logs}</p>`;
                     } else {
                         document.getElementById('message').innerHTML = '<p class="error-message">Error Checking In. Please try again later.</p>';
                     }
@@ -249,6 +250,10 @@
         });
 
         const html5QrCode = new Html5Qrcode("qr-reader");
+        function calculateQrboxSize() {
+            const screenWidth = window.innerWidth;
+            return screenWidth < 600 ? 200 : 250;
+        }
 
         closeCameraBtn.addEventListener('click', function () {
             html5QrCode.stop().then(() => {
@@ -262,14 +267,14 @@
 
         openCameraBtn.addEventListener("click", function () {
             qrReader.style.display = "block";
-            closeCameraBtn.style.display = "block";
             document.getElementById('message').style.display = "none";
+            closeCameraBtn.style.display = "block";
             openCameraBtn.style.display = "none";
             html5QrCode.start(
                 { facingMode: "environment" },
                 {
                     fps: 10,
-                    qrbox: 250
+                    qrbox: calculateQrboxSize()
                 },
                 (decodedText) => {
                     console.log("Decoded Text: ", decodedText);
@@ -285,7 +290,6 @@
 
                     try {
                         uniqueId = decodedText;
-                        document.getElementById('message').innerHTML = `<p class="check-message">QR Code scanned: ${uniqueId}. Now click the button to check-in.</p>`;
                         checkinButton.disabled = false;
                     } catch (error) {
                         console.error("Invalid QR code format", error);

@@ -11,7 +11,7 @@ app.get('/checkin', async (req, res) => {
         if (!uniqueId) {
             return res.status(400).json({ checkedIn: false, error: 'No uniqueId provided in the URL' });
         }
-        const response = await axios.get(`https://script.google.com/macros/s/AKfycbznUtnbMie6oSlspH7w2LBmDzTprbThfcsZp2SwVyijxq3WF7FoyqpibzTSUsmrDRO3eA/exec`, {
+        const response = await axios.get(`https://script.google.com/macros/s/AKfycbwZVLMFg6mvFiw_MonXPvFcNBB8gG_evO6dIVb9-BxuN7OnhnhcS3B4gw9sTnfpVdwfIA/exec`, {
             params: { uniqueId: uniqueId }
         });
         res.json(response.data);
