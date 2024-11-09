@@ -60,7 +60,7 @@
         }
 
         // Check if the person has already checked in
-        fetch(`https://script.google.com/macros/s/AKfycbxNDS6eMPH2UwQCVtxe9m9RwP3oxy1q9Cpk_twm5oJI_Du0ppls3UvIDYeaaEMvxiREug/exec?uniqueId=${uniqueId}`)
+        fetch(`https://script.google.com/macros/s/AKfycbwmI7-djfuQWBLh4acVV_rPRtdaIefqQJoj8f-qvkqWiQWj-dbzD1414b6PP9pF26oHag/exec?uniqueId=${uniqueId}`)
         .then(response => response.json())
         .then(data => {
             if (data.checkedIn) {
@@ -96,7 +96,7 @@
             checkinButton.disabled = true;  // Disable the button to prevent multiple clicks
 
             // Call Google Apps Script API to check the person in
-            fetch(`https://script.google.com/macros/s/AKfycbyEZBAC0i-olxk0JhdzshHWs41bStrt2mjtJ7sZL8hiGO8zg77Tz5cuW9qByUbjCQpjvw/exec?uniqueId=${uniqueId}`)
+            fetch(`https://script.google.com/macros/s/AKfycbx4DrItG7ztfJQwhAi9ayss8zLyZL1pU4lTnEa7xjpoxthXK6ZcCOMrDUddf8o9K2IeTg/exec?uniqueId=${uniqueId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.checkedIn) {
