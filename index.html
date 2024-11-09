@@ -55,10 +55,12 @@
         const passwordButton = document.getElementById('password-button');
         const passwordField = document.getElementById('password');
         
+        // Check if the uniqueId is present
         if (!uniqueId) {
             document.getElementById('message').innerHTML = '<p class="error-message">No ID provided in URL.</p>';
         }
 
+        // Handle password submission and enable check-in button if password is correct
         passwordButton.addEventListener('click', () => {
             const password = passwordField.value;
 
@@ -79,8 +81,11 @@
             checkinButton.disabled = true;  // Disable the button to prevent multiple clicks
 
             // Call Google Apps Script API to check the person in
-            fetch(`https://script.google.com/macros/s/AKfycbyDXrm10pqfnK3SXGJLynq7aKurIaCfnBU3G93bgwlNEkYQ-1i0zRIe-P0cVOkv_XKZ1g/exec?uniqueId=${uniqueId}`, {method: 'GET', redirect:"follow"})
-            .then(response => response.json())
+            fetch(`https://script.google.com/macros/s/AKfycbyDXrm10pqfnK3SXGJLynq7aKurIaCfnBU3G93bgwlNEkYQ-1i0zRIe-P0cVOkv_XKZ1g/exec?uniqueId=${uniqueId}`, {
+                method: 'GET',
+                redirect: "follow"
+            })
+            .then(response => response.json()) // Parse JSON response
             .then(data => {
                 if (data.checkedIn) {
                     document.getElementById('message').innerHTML = '<p class="check-message">Checked In Successfully!</p>';
