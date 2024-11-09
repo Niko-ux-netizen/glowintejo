@@ -79,7 +79,7 @@
             checkinButton.disabled = true;  // Disable the button to prevent multiple clicks
 
             // Call Google Apps Script API to check the person in
-            fetch(`https://script.google.com/macros/s/AKfycbyDXrm10pqfnK3SXGJLynq7aKurIaCfnBU3G93bgwlNEkYQ-1i0zRIe-P0cVOkv_XKZ1g/exec?uniqueId=${uniqueId}`, {method: 'GET', mode:"no-cors"})
+            fetch(`https://script.google.com/macros/s/AKfycbyDXrm10pqfnK3SXGJLynq7aKurIaCfnBU3G93bgwlNEkYQ-1i0zRIe-P0cVOkv_XKZ1g/exec?uniqueId=${uniqueId}`, {method: 'GET', redirect:"follow"})
             .then(response => response.json())
             .then(data => {
                 if (data.checkedIn) {
