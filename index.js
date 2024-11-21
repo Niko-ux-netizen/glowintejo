@@ -2,7 +2,12 @@ const axios = require('axios');
 const express = require('express');
 const cors = require('cors'); 
 const app = express();
-
+const corsOptions = {
+    origin: '*', // Change '*' to specific domains if needed
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type'],
+};
+app.use(cors(corsOptions));
 app.use(cors());
 app.use(express.json());
 app.get('/checkin', async (req, res) => {

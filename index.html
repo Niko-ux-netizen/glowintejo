@@ -173,6 +173,7 @@
 <body>
 
     <div class="container">
+        
         <h2>QR Code Check</h2>
         <h1>Login to Check-in</h1>
 
@@ -224,7 +225,7 @@
         checkinButton.addEventListener('click', () => {
             loadingIndicator.style.display = 'block';
             checkinButton.disabled = true;
-            fetch(`http://localhost:3000/checkin?uniqueId=${uniqueId}`, {
+            fetch(`/api/checkin?uniqueId=${uniqueId}`, {
                 method: 'GET',
             })
                 .then(response => {
