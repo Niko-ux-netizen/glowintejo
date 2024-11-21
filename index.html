@@ -225,7 +225,7 @@
         checkinButton.addEventListener('click', () => {
             loadingIndicator.style.display = 'block';
             checkinButton.disabled = true;
-            fetch(`/api/checkin?uniqueId=${uniqueId}`, {
+            fetch(`http://localhost:3000/checkin?uniqueId=${uniqueId}`, {
                 method: 'GET',
             })
                 .then(response => {
