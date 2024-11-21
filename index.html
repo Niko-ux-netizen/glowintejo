@@ -225,7 +225,7 @@
         checkinButton.addEventListener('click', () => {
             loadingIndicator.style.display = 'block';
             checkinButton.disabled = true;
-            fetch(`https://glowintejo.vercel.app//checkin?uniqueId=${uniqueId}`, {
+            fetch(`https://glowintejo.vercel.app/checkin?uniqueId=${uniqueId}`, {
                 method: 'GET',
             })
                 .then(response => {
